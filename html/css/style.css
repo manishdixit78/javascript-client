@@ -217,3 +217,51 @@ ul.breadcrumb li+li:before {
     flex: 1;
     font-size: 15px;
 }
+
+@media (min-width:992px) {
+    .container {
+        margin-left: 100px;
+        margin-right: 100px;
+    }
+    .payment {
+        flex: 3;
+    }
+    .item4{
+        flex: 2;
+    }
+}
+
+@media (max-width:992px) {
+    .container {
+        margin-left: 20px;
+        margin-right: 20px;
+    }
+}
+
+@media screen and (min-width: 768px) and (max-width: 992px) {
+    .payment {
+        flex: 1;
+    }
+    .item4 {
+        flex: 1;
+    }
+}
+
+@media (max-width:600px) {
+    .second-flex-container {
+        flex-direction: column-reverse;
+    }
+}
+
+@media (max-width: 768px) {
+    .breadcrumb {
+        display: none;
+    }
+}
+
+@media (max-width: 400px) {
+    .image {
+        display: flex;
+        flex-direction: column;
+    }
+}
