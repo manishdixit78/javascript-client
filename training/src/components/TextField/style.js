@@ -13,17 +13,17 @@ border: 1px solid gray;
 border-radius: 5px;
 color: solid gray;
 ${(props) => props.error
-    && css`
+        && css`
     border: 1px solid red;
     color: red;
     `};
 }
-${(props) => (props.value && !props.disabled && !props.error) 
-    && css`
+${(props) => (props.value && !props.disabled && !props.error)
+        && css`
     border: 1px solid orange;
     color: black;
     `};
 }
 `;
-export { Div, Error, Input }; 
+export { Div, Error, Input };
 
