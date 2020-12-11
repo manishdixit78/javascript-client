@@ -4,18 +4,20 @@ import { Error, Input } from './style';
 
 const TextField = (props) => {
   const {
-    value, disabled, error, onChange,
+    value, disabled, error, onChange, onBlur,
   } = props;
+  // eslint-disable-next-line no-console
+
   if (error) {
     return (
       <>
-        <Input type="text" value={value} error onChange={onChange} />
+        <Input type="text" value={value} error onChange={onChange} onBlur={onBlur} />
         <Error>{error}</Error>
       </>
     );
   }
   return (
-    <Input type="text" value={value} disabled={disabled} onChange={onChange} />
+    <Input type="text" value={value} disabled={disabled} onChange={onChange} onBlur={onBlur} />
   );
 };
 export default TextField;
@@ -25,6 +27,7 @@ TextField.propTypes = {
   disabled: PropTypes.bool,
   error: PropTypes.string,
   onChange: PropTypes.func,
+  onBlur: PropTypes.string.isRequired,
 };
 TextField.defaultProps = {
   disabled: false,
