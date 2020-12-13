@@ -26,4 +26,3 @@ ${(props) => (props.value && !props.disabled && !props.error)
 }
 `;
 export { Div, Error, Input };
-
