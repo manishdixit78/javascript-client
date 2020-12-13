@@ -1,9 +1,9 @@
-import { TextFieldDemo } from './pages';
+import { InputDemo } from './pages';
 
 function App() {
   return (
     // eslint-disable-next-line react/react-in-jsx-scope
-    <TextFieldDemo />
+    <InputDemo />
   );
 }
 export default App;
