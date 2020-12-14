@@ -1,9 +1,9 @@
-import { InputDemo } from './pages';
+import React from 'react';
+import { ChildrenDemo } from './pages';
 
 function App() {
   return (
-    // eslint-disable-next-line react/react-in-jsx-scope
-    <InputDemo />
+    <ChildrenDemo />
   );
 }
 export default App;
