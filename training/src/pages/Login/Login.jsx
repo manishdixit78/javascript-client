@@ -118,7 +118,6 @@ class Login extends React.Component {
                       fullWidth
                       id="outlined-required"
                       label="Password"
-                      defaultValue=" "
                       variant="outlined"
                       helperText={this.getError('password')}
                       error={!!this.getError('password')}
