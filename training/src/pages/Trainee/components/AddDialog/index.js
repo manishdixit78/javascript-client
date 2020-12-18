@@ -1,1 +1,1 @@
-export { default as AddDialog } from './AddDialog.jsx';
+export { default as AddDialog } from './AddDialog';

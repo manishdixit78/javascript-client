@@ -20,6 +20,7 @@ const passwordStyle = () => ({
 
 const constant = {
   Name: Person,
+  // eslint-disable-next-line object-shorthand
   Email: Email,
   Password: VisibilityOff,
   'Confirm Password': VisibilityOff,
@@ -55,6 +56,7 @@ class AddDialog extends React.Component {
       return false;
     }
 
+    // eslint-disable-next-line consistent-return
     getError = (field) => {
       const { touched } = this.state;
       if (touched[field] && this.hasErrors()) {
@@ -108,7 +110,7 @@ class AddDialog extends React.Component {
             <DialogTitle id="form-dialog-title">Add Trainee</DialogTitle>
             <DialogContent>
               <DialogContentText>
-            Enter your trainee details
+                Enter your trainee details
               </DialogContentText>
               <div>
                 {ans[0]}

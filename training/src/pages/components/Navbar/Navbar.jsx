@@ -1,5 +1,8 @@
 import React from 'react';
-import { AppBar, Toolbar, Typography, CssBaseline, Button, withStyles } from '@material-ui/core';
+import PropTypes from 'prop-types';
+import {
+  AppBar, Toolbar, Typography, CssBaseline, Button, withStyles,
+} from '@material-ui/core';
 
 const style = () => ({
   title: {
@@ -7,7 +10,7 @@ const style = () => ({
   },
   logout: {
     flexGrow: 0.05,
-  }
+  },
 });
 
 function NavBar(props) {
@@ -17,7 +20,7 @@ function NavBar(props) {
       <CssBaseline />
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6" className={classes.title} >
+          <Typography variant="h6" className={classes.title}>
             Trainee Portal
           </Typography>
           <Button color="inherit">TRAINEE</Button>
@@ -28,6 +31,9 @@ function NavBar(props) {
         </Toolbar>
       </AppBar>
     </>
-  )
+  );
 }
+NavBar.propTypes = {
+  classes: PropTypes.objectOf(PropTypes.string).isRequired,
+};
 export default withStyles(style)(NavBar);
