@@ -44,7 +44,7 @@ function TraineeDetails(props) {
   const { classes } = props;
   const { match } = props;
   const traineeData = trainees.find(({ id }) => id === match.params.traineeId);
-  const dateFormat = () => moment(traineeData.createdAt).format('dddd, MMMM Do YYYY, h:mm:ss a');
+  const getDateFormatted = () => moment(traineeData.createdAt).format('dddd, MMMM Do YYYY, h:mm:ss a');
   if (traineeData === undefined) {
     return (
       <Route component={NotFound} />
@@ -62,7 +62,7 @@ function TraineeDetails(props) {
               {traineeData.name}
             </Typography>
             <Typography component="subtitle1" color="textSecondary">
-              {dateFormat()}
+              {getDateFormatted()}
             </Typography>
             <Typography component="h6" variant="h6">
               {traineeData.email}
