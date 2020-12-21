@@ -26,10 +26,10 @@ function NotFound(props) {
         <Typography>
           <div className={classes.Text} align="center">
             <h1>
-                NOT FOUND
+              NOT FOUND
             </h1>
             <h4>
-            seems like the pages you are looking after does not exist
+              seems like the pages you are looking after does not exist
             </h4>
           </div>
         </Typography>

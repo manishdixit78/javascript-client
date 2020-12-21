@@ -6,7 +6,7 @@ const Footer = () => (
     <Box mt={2}>
       <Typography variant="body2" color="black" align="center">
         {' © '}
-      Successive Technology
+        Successive Technology
       </Typography>
     </Box>
   </>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 import { AddDialog } from './components';
+
 class Trainee extends React.Component {
   constructor(props) {
     super(props);
@@ -8,6 +9,7 @@ class Trainee extends React.Component {
       open: false,
     };
   }
+
          handleClickOpen = () => {
            this.setState({ open: true });
          };

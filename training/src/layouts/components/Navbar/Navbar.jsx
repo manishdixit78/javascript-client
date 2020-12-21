@@ -29,7 +29,7 @@ function NavBar() {
         <Toolbar>
           <Typography variant="h6" className={classes.title}>
             Trainee Portal
-</Typography>
+          </Typography>
           <Button component={Link} to="/Trainee" color="inherit">TRAINEE</Button>
           <Button component={Link} to="/TextFieldDemo" color="inherit">TEXTFIELD DEMO</Button>
           <Button component={Link} to="/InputDemo" color="inherit">INPUT DEMO</Button>
