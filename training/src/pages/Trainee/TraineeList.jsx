@@ -1,7 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, withStyles } from '@material-ui/core';
-import { AddDialog } from './components/index';
+import EditIcon from '@material-ui/icons/Edit';
+import DeleteIcon from '@material-ui/icons/Delete';
+import { AddDialog, EditDialog, DeleteDialog } from './components/index';
 import { TableComponent } from '../../components';
 import trainees from './data/trainee';
 
@@ -21,6 +23,12 @@ class TraineeList extends React.Component {
       open: false,
       orderBy: '',
       order: 'asc',
+      EditOpen: false,
+      RemoveOpen: false,
+      editData: {},
+      deleteData: {},
+      page: 0,
+      rowsPerPage: 10,
     };
   }
 
@@ -39,7 +47,7 @@ class TraineeList extends React.Component {
       open: false,
     }, () => {
       // eslint-disable-next-line no-console
-      console.log(data);
+      console.log('Data :', data);
     });
   }
 
@@ -58,8 +66,61 @@ class TraineeList extends React.Component {
     });
   };
 
+  handleChangePage = (event, newPage) => {
+    this.setState({
+      page: newPage,
+    });
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  handleRemoveDialogOpen = (element) => (event) => {
+    this.setState({
+      RemoveOpen: true,
+      deleteData: element,
+    });
+  };
+
+  handleRemoveClose = () => {
+    this.setState({
+      RemoveOpen: false,
+    });
+  };
+
+  handleRemove = () => {
+    const { deleteData } = this.state;
+    this.setState({
+      RemoveOpen: false,
+    });
+    // eslint-disable-next-line no-console
+    console.log('Deleted Item ', deleteData);
+  };
+
+  // eslint-disable-next-line no-unused-vars
+  handleEditDialogOpen = (element) => (event) => {
+    this.setState({
+      EditOpen: true,
+      editData: element,
+    });
+  };
+
+  handleEditClose = () => {
+    this.setState({
+      EditOpen: false,
+    });
+  };
+
+  handleEdit = (name, email) => {
+    this.setState({
+      EditOpen: false,
+    });
+    // eslint-disable-next-line no-console
+    console.log('Edited Item ', { name, email });
+  };
+
   render() {
-    const { open, order, orderBy } = this.state;
+    const {
+      open, order, orderBy, page, rowsPerPage, EditOpen, RemoveOpen, editData,
+    } = this.state;
     const { classes } = this.props;
     return (
       <>
@@ -72,6 +133,20 @@ class TraineeList extends React.Component {
           </div>
           &nbsp;
           &nbsp;
+          <EditDialog
+            Editopen={EditOpen}
+            handleEditClose={this.handleEditClose}
+            handleEdit={this.handleEdit}
+            data={editData}
+          />
+          <br />
+          <DeleteDialog
+            openRemove={RemoveOpen}
+            onClose={this.handleRemoveClose}
+            remove={this.handleRemove}
+          />
+          <br />
+          <br />
           <TableComponent
             id="id"
             data={trainees}
@@ -94,10 +169,25 @@ class TraineeList extends React.Component {
                 },
               ]
             }
+            actions={[
+              {
+                icon: <EditIcon />,
+                handler: this.handleEditDialogOpen,
+
+              },
+              {
+                icon: <DeleteIcon />,
+                handler: this.handleRemoveDialogOpen,
+              },
+            ]}
             onSort={this.handleSort}
             orderBy={orderBy}
             order={order}
             onSelect={this.handleSelect}
+            count={100}
+            page={page}
+            onChangePage={this.handleChangePage}
+            rowsPerPage={rowsPerPage}
           />
         </div>
       </>
