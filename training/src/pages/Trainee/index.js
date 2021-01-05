@@ -1,1 +1,1 @@
-export { default as Trainee } from './Trainee.jsx';
+export { default as Trainee } from './Trainee';
