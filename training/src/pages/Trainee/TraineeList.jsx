@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, withStyles } from '@material-ui/core';
@@ -5,7 +6,7 @@ import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { AddDialog, EditDialog, DeleteDialog } from './components/index';
 import { TableComponent } from '../../components';
-import trainees from './data/trainee';
+import callApi from '../../libs/utils/api';
 
 const useStyles = (theme) => ({
   root: {
@@ -29,6 +30,9 @@ class TraineeList extends React.Component {
       deleteData: {},
       page: 0,
       rowsPerPage: 10,
+      loading: false,
+      Count: 0,
+      dataObj: [],
     };
   }
 
@@ -42,23 +46,28 @@ class TraineeList extends React.Component {
     return open;
   };
 
+  handleChangeRowsPerPage = (event) => {
+    this.setState({
+      rowsPerPage: event.target.value,
+      page: 0,
+
+    });
+  };
+
   handleSubmit = (data) => {
     this.setState({
       open: false,
     }, () => {
-      // eslint-disable-next-line no-console
       console.log('Data :', data);
     });
   }
 
   handleSelect = (event) => {
-    // eslint-disable-next-line no-console
     console.log(event);
   };
 
   handleSort = (field) => (event) => {
     const { order } = this.state;
-    // eslint-disable-next-line no-console
     console.log(event);
     this.setState({
       orderBy: field,
@@ -67,6 +76,7 @@ class TraineeList extends React.Component {
   };
 
   handleChangePage = (event, newPage) => {
+    this.componentDidMount(newPage);
     this.setState({
       page: newPage,
     });
@@ -91,7 +101,6 @@ class TraineeList extends React.Component {
     this.setState({
       RemoveOpen: false,
     });
-    // eslint-disable-next-line no-console
     console.log('Deleted Item ', deleteData);
   };
 
@@ -113,14 +122,36 @@ class TraineeList extends React.Component {
     this.setState({
       EditOpen: false,
     });
-    // eslint-disable-next-line no-console
     console.log('Edited Item ', { name, email });
   };
 
+  componentDidMount = () => {
+    this.setState({ loading: true });
+    const value = this.context;
+    console.log('val :', value);
+    // eslint-disable-next-line consistent-return
+    callApi({ }, 'get', `/trainee?skip=${0}&limit=${20}`).then((response) => {
+      if (response.record === undefined) {
+        this.setState({
+          loading: false,
+        }, () => {
+        });
+      } else {
+        console.log('res inside traineelist :', response);
+        const { record } = response;
+        console.log('records aa :', record);
+        this.setState({ dataObj: record, loading: false, Count: 100 });
+        return response;
+      }
+    });
+  }
+
   render() {
     const {
-      open, order, orderBy, page, rowsPerPage, EditOpen, RemoveOpen, editData, deleteData,
+      open, order, orderBy, page,
+      rowsPerPage, EditOpen, RemoveOpen, editData, deleteData, loading, dataObj, Count,
     } = this.state;
+    console.log('data inside traineelist :', dataObj);
     const { classes } = this.props;
     return (
       <>
@@ -149,8 +180,9 @@ class TraineeList extends React.Component {
           <br />
           <br />
           <TableComponent
+            loader={loading}
             id="id"
-            data={trainees}
+            data={dataObj}
             column={
               [
                 {
@@ -185,10 +217,11 @@ class TraineeList extends React.Component {
             orderBy={orderBy}
             order={order}
             onSelect={this.handleSelect}
-            count={100}
+            count={Count}
             page={page}
             onChangePage={this.handleChangePage}
             rowsPerPage={rowsPerPage}
+            onChangeRowsPerPage={this.handleChangeRowsPerPage}
           />
         </div>
       </>

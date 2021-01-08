@@ -61,17 +61,17 @@ class Login extends React.Component {
       this.setState({ [key]: value });
     };
 
-    onClickHandler = async (data, openSnackBar) => {
+    onClickHandler = async (data , openSnackBar) => {
       console.log('Data is :', data);
       this.setState({
         loading: true,
         hasError: true,
       });
-      await callApi(data, 'post', '/user/login');
+     const response1 = await callApi(data, 'post', '/user/login');
+      localStorage.set('token', response1.data)
       this.setState({ loading: false });
       const response = localStorage.get('token');
-      console.log(' res inside login :', response.status);
-      if (response.status === 200) {
+      if (response !== 'undefined') {
         this.setState({
           redirect: true,
           hasError: false,
