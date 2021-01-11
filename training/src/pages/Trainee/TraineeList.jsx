@@ -7,6 +7,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { AddDialog, EditDialog, DeleteDialog } from './components/index';
 import { TableComponent } from '../../components';
 import callApi from '../../libs/utils/api';
+import { MyContext } from '../../contexts/index';
 
 const useStyles = (theme) => ({
   root: {
@@ -26,6 +27,7 @@ class TraineeList extends React.Component {
       order: 'asc',
       EditOpen: false,
       RemoveOpen: false,
+      message: '',
       editData: {},
       deleteData: {},
       page: 0,
@@ -130,11 +132,14 @@ class TraineeList extends React.Component {
     const value = this.context;
     console.log('val :', value);
     // eslint-disable-next-line consistent-return
-    callApi({ }, 'get', `/trainee?skip=${0}&limit=${20}`).then((response) => {
+    callApi({ }, 'get', `/trainee?skip=${0}&limit=${100}`).then((response) => {
       if (response.record === undefined) {
         this.setState({
           loading: false,
+          message: 'Error, While fetching the Data',
         }, () => {
+          const { message } = this.state;
+          value.openSnackBar(message, 'error');
         });
       } else {
         console.log('res inside traineelist :', response);
@@ -228,6 +233,7 @@ class TraineeList extends React.Component {
     );
   }
 }
+TraineeList.contextType = MyContext;
 TraineeList.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
 };
