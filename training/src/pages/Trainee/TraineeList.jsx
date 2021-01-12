@@ -119,7 +119,7 @@ class TraineeList extends React.Component {
 
   render() {
     const {
-      open, order, orderBy, page, rowsPerPage, EditOpen, RemoveOpen, editData,
+      open, order, orderBy, page, rowsPerPage, EditOpen, RemoveOpen, editData, deleteData,
     } = this.state;
     const { classes } = this.props;
     return (
@@ -141,9 +141,10 @@ class TraineeList extends React.Component {
           />
           <br />
           <DeleteDialog
-            openRemove={RemoveOpen}
+            data={deleteData}
             onClose={this.handleRemoveClose}
-            remove={this.handleRemove}
+            onSubmit={this.handleRemove}
+            open={RemoveOpen}
           />
           <br />
           <br />
