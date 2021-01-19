@@ -1,6 +1,5 @@
 /* eslint-disable */
 import axios from 'axios';
-import localStorage from 'local-storage';
 
 const callApi = async (data, method, url) => {
   console.log('Data inside callapi ', data);
@@ -12,7 +11,7 @@ const callApi = async (data, method, url) => {
       url: baseUrl,
       data,
       headers: {
-       authorization: localStorage.get('token'),
+       authorization: localStorage.getItem('token'),
       },
     });
     return response.data;
