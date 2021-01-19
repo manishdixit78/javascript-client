@@ -8,7 +8,6 @@ import {
   CardContent, withStyles, InputAdornment, Button, CircularProgress,
 } from '@material-ui/core';
 import { Email, VisibilityOff, LockOutlined } from '@material-ui/icons';
-import localStorage from 'local-storage';
 import callApi from '../../libs/utils/api';
 import { MyContext } from '../../contexts/snackBarProvider/index';
 
@@ -70,7 +69,8 @@ class Login extends React.Component {
      const response = await callApi(data, 'post', '/user/login');
       this.setState({ loading: false });
       if (response.status === 200) {
-        localStorage.set('token', response.data)
+        const a = localStorage.setItem('token', response.data);
+        console.log('a :', a);
         this.setState({
           redirect: true,
           hasError: false,
