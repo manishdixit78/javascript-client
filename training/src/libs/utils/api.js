@@ -14,7 +14,6 @@ const callApi = async (data, method, url) => {
        authorization: localStorage.getItem('token'),
       },
     });
-    console.log('res in api :', response);
     return response.data;
   } catch (error) {
     console.log('Inside catch of api', error , error.response);
