@@ -1,6 +1,5 @@
 /* eslint-disable */
 import React from 'react';
-import * as yup from 'yup';
 import PropTypes from 'prop-types';
 import { Redirect } from 'react-router-dom';
 import {
@@ -8,31 +7,11 @@ import {
   CardContent, withStyles, InputAdornment, Button, CircularProgress,
 } from '@material-ui/core';
 import { Email, VisibilityOff, LockOutlined } from '@material-ui/icons';
-import localStorage from 'local-storage';
 import callApi from '../../libs/utils/api';
 import { MyContext } from '../../contexts/snackBarProvider/index';
+import schema from './schema';
+import Design from './style';
 
-const schema = yup.object().shape({
-  email: yup.string()
-    .trim().email().required('Email Address is a required field'),
-  password: yup.string()
-    .required('Password is required'),
-});
-const Design = (theme) => ({
-  icon: {
-    background: 'red',
-    marginLeft: theme.spacing(22),
-    marginTop: theme.spacing(2),
-  },
-  main: {
-    width: 400,
-    marginTop: theme.spacing(20),
-    marginLeft: theme.spacing(58),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-});
 class Login extends React.Component {
   constructor(props) {
     super(props);
@@ -61,17 +40,17 @@ class Login extends React.Component {
       this.setState({ [key]: value });
     };
 
-    onClickHandler = async (data, openSnackBar) => {
+    onClickHandler = async (data , openSnackBar) => {
       console.log('Data is :', data);
       this.setState({
         loading: true,
         hasError: true,
       });
-      await callApi(data, 'post', '/user/login');
+     const response1 = await callApi(data, 'post', '/user/login');
+      localStorage.setItem('token', response1.data)
       this.setState({ loading: false });
-      const response = localStorage.get('token');
-      console.log(' res inside login :', response.status);
-      if (response.status === 200) {
+      const response = localStorage.getItem('token');
+      if (response !== 'undefined') {
         this.setState({
           redirect: true,
           hasError: false,
