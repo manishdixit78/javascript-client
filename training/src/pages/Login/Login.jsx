@@ -7,7 +7,6 @@ import {
   CardContent, withStyles, InputAdornment, Button, CircularProgress,
 } from '@material-ui/core';
 import { Email, VisibilityOff, LockOutlined } from '@material-ui/icons';
-import callApi from '../../libs/utils/api';
 import { MyContext } from '../../contexts/snackBarProvider/index';
 import schema from './schema';
 import Design from './style';
@@ -41,12 +40,15 @@ class Login extends React.Component {
     };
 
     onClickHandler = async (data , openSnackBar) => {
-      console.log('Data is :', data);
+      const { loginUser } = this.props;
+      const { email, password } = data;
+      console.log('props :', loginUser);
       this.setState({
         loading: true,
         hasError: true,
       });
-     const response = await callApi(data, 'post', '/user/login');
+     const responseLogin = await loginUser({ variables:{ email, password } });
+     const response = JSON.parse(responseLogin.data.loginUser);
       this.setState({ loading: false });
       if (response.status === 200) {
        localStorage.setItem('token', response.data);

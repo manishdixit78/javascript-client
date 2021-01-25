@@ -21,6 +21,7 @@ class DeleteDialog extends Component {
   }
 
 handleChange = (prop) => (event) => {
+  // eslint-disable-next-line no-console
   this.setState({ [prop]: event.target.value }, () => console.log(this.state));
 };
 
