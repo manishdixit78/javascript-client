@@ -1,54 +1,25 @@
 import { InMemoryCache } from 'apollo-boost';
-import ApolloClient from 'apollo-client';
-import { split } from 'apollo-link';
+import { ApolloClient } from '@apollo/client';
 import { HttpLink } from 'apollo-link-http';
-import { setContext } from 'apollo-link-context';
-import { getMainDefinition } from 'apollo-utilities';
+import { setContext } from '@apollo/client/link/context';
 
-const httpLink = new HttpLink({
-  uri: process.env.REACT_APP_APOLLO_GRAPHQL_URI,
-  options: {
-    reconnect: true,
-  },
-});
+const link = new HttpLink({ uri: process.env.REACT_APP_APOLLO_GRAPHQL_URI });
 
 const authLink = setContext((_, { headers }) => {
+// get the authentication token if it's exists
   const token = localStorage.getItem('token');
+  // return the headers to the context so httplink can read them
   return {
     headers: {
       ...headers,
-      authorization: token,
+      authorization: token ? `Bearer ${token}` : '',
     },
   };
 });
 
-const link = split(
-  ({ query }) => {
-    const definition = getMainDefinition(query);
-    return (
-      definition.kind === 'OperationDefinition'
-&& definition.operation === 'subscription'
-    );
-  },
-  httpLink,
-);
-
-const cache = new InMemoryCache();
-
-const setHeaders = (operation) => operation.setContext({ headers: { authorization: localStorage.getItem('token') } });
-
-const client = new ApolloClient({
+const Apolloclient = new ApolloClient({
+  cache: new InMemoryCache(),
   link: authLink.concat(link),
-  cache,
-  request: setHeaders,
 });
 
-const initialState = {
-  token: '',
-};
-
-cache.writeData({ data: initialState });
-
-client.onResetStore(() => cache.writeData({ data: initialState }));
-
-export default client;
+export default Apolloclient;

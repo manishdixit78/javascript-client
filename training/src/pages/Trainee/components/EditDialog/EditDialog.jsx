@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { withStyles } from '@material-ui/core/styles';
 import * as yup from 'yup';
 import { MyContext } from '../../../../contexts';
+import callApi from '../../../../libs/utils/api';
 import {
   TextField,
   Dialog,
@@ -13,6 +14,7 @@ import {
   DialogTitle,
   Button,
   InputAdornment,
+  CircularProgress,
 } from '@material-ui/core';
 import Grid from '@material-ui/core/Grid';
 import EmailIcon from '@material-ui/icons/Email';
@@ -39,6 +41,7 @@ class EditDialog extends React.Component {
     this.state = {
       name: '',
       email: '',
+      loading: false,
       error: {
         name: '',
         email: '',
@@ -95,11 +98,38 @@ class EditDialog extends React.Component {
     return !!iserror.length;
   };
 
+  onClickHandler = async (Data, openSnackBar) => {
+    console.log('data inside edit :', Data)
+    const { onSubmit } = this.props;
+    this.setState({
+      loading: true,
+    });
+    const response = await callApi(Data, 'put', '/trainee');
+    console.log('Response :', response);
+    this.setState({ loading: false });
+    if (response !== 'undefined') {
+      this.setState({
+        message: 'Trainee Updated Successfully',
+      }, () => {
+        const { message } = this.state;
+        openSnackBar(message, 'success');
+      });
+    } else {
+      this.setState({
+        message: 'Error while submitting',
+      }, () => {
+        const { message } = this.state;
+        openSnackBar(message, 'error');
+      });
+    }
+  }
   render() {
     const {
       Editopen, handleEditClose, handleEdit, data, classes,
     } = this.props;
-    const { name, email, error } = this.state;
+    const { name, email, error, loading } = this.state;
+    const { originalId: id } = data;
+    console.log('id in edit: ', id);
     return (
       <div>
         <Dialog
@@ -171,8 +201,7 @@ class EditDialog extends React.Component {
           {({ openSnackBar }) => (
             <Button
               onClick={() => {
-                handleEdit(name, email);
-                openSnackBar('This is a successfully updated message ! ', 'success');
+                this.onClickHandler({ name, email, id }, openSnackBar);
               }}
               className={
                 (name === data.name && email === data.email) || this.hasErrors()
@@ -184,7 +213,11 @@ class EditDialog extends React.Component {
                 !!((name === data.name && email === data.email) || this.hasErrors())
               }
             >
-              Submit
+               {loading && (
+                    <CircularProgress size={15} />
+                  )}
+                  {loading && <span>Submitting</span>}
+                  {!loading && <span>Submit</span>}
             </Button>
                  )}
                  </MyContext.Consumer>
