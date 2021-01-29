@@ -134,14 +134,14 @@ class TraineeList extends React.Component {
       this.setState({
         EditOpen: false,
       }, () => {
-        openSnackBar('Trainee Created Successfully', 'success');
+        openSnackBar('Trainee Updated Successfully', 'success');
       });
     } catch (err) {
       console.log('err :', err);
       this.setState({
         open: false,
       }, () => {
-        openSnackBar('Error While Creating', 'error');
+        openSnackBar('Error While Updating', 'error');
       });
     }
   };
