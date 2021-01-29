@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button, withStyles } from '@material-ui/core';
+import { Mutation } from '@apollo/react-components';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { graphql } from '@apollo/react-hoc';
@@ -10,6 +11,7 @@ import { AddDialog, EditDialog, DeleteDialog } from './components/index';
 import { TableComponent } from '../../components';
 import { GET_TRAINEE } from './Query';
 import { MyContext } from '../../contexts/index';
+import { UPDATE_TRAINEE, CREATE_TRAINEE } from './Mutation';
 
 const useStyles = (theme) => ({
   root: {
@@ -54,12 +56,25 @@ class TraineeList extends React.Component {
     });
   };
 
-  handleSubmit = (data) => {
-    this.setState({
-      open: false,
-    }, () => {
-      console.log('Data :', data);
-    });
+  onSubmitAdd = async (data, openSnackBar, createTrainee, refetch) => {
+    try {
+      const { name, email, password } = data;
+      console.log('data in cre :', name, email, password);
+      await createTrainee({ variables: { name, email, password } });
+      refetch();
+      this.setState({
+        open: false,
+      }, () => {
+        openSnackBar('Trainee Created Successfully', 'success');
+      });
+    } catch (err) {
+      console.log('err :', err);
+      this.setState({
+        open: false,
+      }, () => {
+        openSnackBar('Error While Creating', 'error');
+      });
+    }
   }
 
   handleSelect = (event) => {
@@ -111,11 +126,24 @@ class TraineeList extends React.Component {
     });
   };
 
-  handleEdit = (name, email) => {
-    this.setState({
-      EditOpen: false,
-    });
-    console.log('Edited Item ', { name, email });
+  onSubmitEdit = async (data, openSnackBar, updateTrainee, refetch) => {
+    try {
+      const { name, email, id } = data;
+      await updateTrainee({ variables: { name, email, id } });
+      refetch();
+      this.setState({
+        EditOpen: false,
+      }, () => {
+        openSnackBar('Trainee Created Successfully', 'success');
+      });
+    } catch (err) {
+      console.log('err :', err);
+      this.setState({
+        open: false,
+      }, () => {
+        openSnackBar('Error While Creating', 'error');
+      });
+    }
   };
 
   handlePageChange = (refetch) => (event, newPage) => {
@@ -140,82 +168,113 @@ class TraineeList extends React.Component {
         loading,
       },
     } = this.props;
+    const variables = { skip: page * rowsPerPage.length, limit: rowsPerPage.length };
     return (
       <>
-        <div className={classes.root}>
-          <div className={classes.dialog}>
-            <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
-              ADD TRAINEELIST
-            </Button>
-            <AddDialog
-              open={open}
-              onClose={this.handleClose}
-              onSubmit={() => this.handleSubmit}
-              refetch={refetch}
-            />
-          </div>
+        <Mutation
+          mutation={CREATE_TRAINEE}
+          refetchQueries={[{ query: GET_TRAINEE, variables }]}
+        >
+          {(createTrainee, createrLoader = { loading }) => (
+            <Mutation
+              mutation={UPDATE_TRAINEE}
+              refetchQueries={[{ query: GET_TRAINEE, variables }]}
+            >
+              {(updateTrainee, updateLoader = { loading }) => (
+                <MyContext.Consumer>
+                  {({ openSnackBar }) => (
+                    <>
+                      <div className={classes.root}>
+                        <div className={classes.dialog}>
+                          <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
+                            ADD TRAINEELIST
+                          </Button>
+                          <AddDialog
+                            open={open}
+                            onClose={this.handleClose}
+                            onSubmit={
+                              (data) => this.onSubmitAdd(
+                                data, openSnackBar, createTrainee, refetch,
+                              )
+                            }
+                            loading={createrLoader}
+                          />
+                        </div>
           &nbsp;
           &nbsp;
-          <EditDialog
-            Editopen={EditOpen}
-            handleEditClose={this.handleEditClose}
-            handleEdit={this.handleEdit}
-            data={editData}
-          />
-          <br />
-          <DeleteDialog
-            data={deleteData}
-            onClose={this.handleRemoveClose}
-            onSubmit={this.handleRemove}
-            open={RemoveOpen}
-          />
-          <br />
-          <br />
-          <TableComponent
-            loader={loading}
-            id="id"
-            data={record}
-            column={
-              [
-                {
-                  field: 'name',
-                  label: 'Name',
-                },
-                {
-                  field: 'email',
-                  label: 'Email Address',
-                  format: (value) => value && value.toUpperCase(),
-                },
-                {
-                  field: 'createdAt',
-                  label: 'Date',
-                  align: 'right',
-                  format: this.getDateFormat,
-                },
-              ]
-            }
-            actions={[
-              {
-                icon: <EditIcon />,
-                handler: this.handleEditDialogOpen,
+                        <EditDialog
+                          Editopen={EditOpen}
+                          handleEditClose={this.handleEditClose}
+                          handleEdit={
+                            (data) => this.onSubmitEdit(
+                              data, openSnackBar, updateTrainee, refetch,
+                            )
+                          }
+                          data={editData}
+                          loading={updateLoader}
+                        />
+                        <br />
+                        <DeleteDialog
+                          data={deleteData}
+                          onClose={this.handleRemoveClose}
+                          onSubmit={this.handleRemove}
+                          open={RemoveOpen}
+                          refetch={refetch}
+                        />
+                        <br />
+                        <br />
+                        <TableComponent
+                          loader={loading}
+                          id="id"
+                          data={record}
+                          column={
+                            [
+                              {
+                                field: 'name',
+                                label: 'Name',
+                              },
+                              {
+                                field: 'email',
+                                label: 'Email Address',
+                                format: (value) => value && value.toUpperCase(),
+                              },
+                              {
+                                field: 'createdAt',
+                                label: 'Date',
+                                align: 'right',
+                                format: this.getDateFormat,
+                              },
+                            ]
+                          }
+                          actions={[
+                            {
+                              icon: <EditIcon />,
+                              handler: this.handleEditDialogOpen,
 
-              },
-              {
-                icon: <DeleteIcon />,
-                handler: this.handleRemoveDialogOpen,
-              },
-            ]}
-            onSort={this.handleSort}
-            orderBy={orderBy}
-            order={order}
-            onSelect={this.handleSelect}
-            count={TraineeCount}
-            page={page}
-            onChangePage={this.handlePageChange(refetch, TraineeCount)}
-            rowsPerPage={rowsPerPage}
-            onChangeRowsPerPage={this.handleChangeRowsPerPage}
-          />
-        </div>
+                            },
+                            {
+                              icon: <DeleteIcon />,
+                              handler: this.handleRemoveDialogOpen,
+                            },
+                          ]}
+                          onSort={this.handleSort}
+                          orderBy={orderBy}
+                          order={order}
+                          onSelect={this.handleSelect}
+                          count={TraineeCount}
+                          page={page}
+                          onChangePage={this.handlePageChange(refetch, TraineeCount)}
+                          rowsPerPage={rowsPerPage}
+                          onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                        />
+                      </div>
+                    </>
+                  )}
+                </MyContext.Consumer>
+              )}
+            </Mutation>
+          )}
+        </Mutation>
       </>
     );
   }

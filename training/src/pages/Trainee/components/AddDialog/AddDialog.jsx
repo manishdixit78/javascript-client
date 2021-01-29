@@ -8,8 +8,6 @@ import { Email, VisibilityOff, Person } from '@material-ui/icons';
 import { withStyles } from '@material-ui/core/styles';
 import schema from './DialogSchema';
 import Handler from './Handler';
-import callApi from '../../../../libs/utils/api';
-import { MyContext } from '../../../../contexts';
 
 const passwordStyle = () => ({
   passfield: {
@@ -51,37 +49,6 @@ class AddDialog extends React.Component {
   handleChange = (key) => ({ target: { value } }) => {
     this.setState({ [key]: value });
   };
-
-  onClickHandler = async (data, openSnackBar) => {
-    this.setState({
-      loading: true,
-      hasError: true,
-    });
-    // eslint-disable-next-line react/prop-types
-    const { refetch } = this.props;
-    const response = await callApi(data, 'post', '/trainee');
-    console.log('data :', data);
-    this.setState({ loading: false });
-    console.log('res :', response);
-    if (response.status === 'OK') {
-      refetch();
-      this.setState({
-        hasError: false,
-        message: 'This is a success message',
-      }, () => {
-        const { message } = this.state;
-        openSnackBar(message, 'success');
-      });
-    } else {
-      this.setState({
-        hasError: false,
-        message: 'error in submitting',
-      }, () => {
-        const { message } = this.state;
-        openSnackBar(message, 'error');
-      });
-    }
-  }
 
     hasErrors = () => {
       try {
@@ -134,7 +101,7 @@ class AddDialog extends React.Component {
 
     render() {
       const {
-        open, onClose, classes,
+        open, onClose, classes, onSubmit,
       } = this.props;
       const {
         name, email, password, loading,
@@ -181,27 +148,23 @@ class AddDialog extends React.Component {
           &nbsp;
               <div align="right">
                 <Button onClick={onClose} color="primary">CANCEL</Button>
-                <MyContext.Consumer>
-                  {({ openSnackBar }) => (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      disabled={this.hasErrors()}
-                      onClick={() => {
-                        this.onClickHandler({
-                          name, email, password,
-                        }, openSnackBar);
-                        this.formReset();
-                      }}
-                    >
-                      {loading && (
-                        <CircularProgress size={15} />
-                      )}
-                      {loading && <span>Submitting</span>}
-                      {!loading && <span>Submit</span>}
-                    </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  disabled={this.hasErrors()}
+                  onClick={() => {
+                    onSubmit({
+                      name, email, password,
+                    });
+                    this.formReset();
+                  }}
+                >
+                  {loading && (
+                    <CircularProgress size={15} />
                   )}
-                </MyContext.Consumer>
+                  {loading && <span>Submitting</span>}
+                  {!loading && <span>Submit</span>}
+                </Button>
               </div>
             </DialogContent>
           </Dialog>
@@ -214,4 +177,5 @@ AddDialog.propTypes = {
   open: PropTypes.bool.isRequired,
   onClose: PropTypes.func.isRequired,
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
+  onSubmit: PropTypes.func.isRequired,
 };

@@ -10,6 +10,8 @@ query GetTrainee($skip: Int, $limit:Int, $sort:String) {
       name
       email
       createdAt
+      originalId
+      _id
     }
     }
   }`;
