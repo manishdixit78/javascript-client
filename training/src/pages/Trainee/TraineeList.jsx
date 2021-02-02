@@ -147,11 +147,12 @@ class TraineeList extends React.Component {
   };
 
   handlePageChange = (refetch) => (event, newPage) => {
-    const { rowsPerPage } = this.state;
+    // const { rowsPerPage } = this.state;
+    const { data: { variables } } = this.props;
     this.setState({
       page: newPage,
     }, () => {
-      refetch({ skip: newPage * (rowsPerPage.length), limit: rowsPerPage.length });
+      refetch({ variables });
     });
   }
 
@@ -263,7 +264,7 @@ class TraineeList extends React.Component {
                           onSelect={this.handleSelect}
                           count={TraineeCount}
                           page={page}
-                          onChangePage={this.handlePageChange(refetch, TraineeCount)}
+                          onChangePage={this.handlePageChange(refetch)}
                           rowsPerPage={rowsPerPage}
                           onChangeRowsPerPage={this.handleChangeRowsPerPage}
                         />
@@ -287,6 +288,6 @@ TraineeList.propTypes = {
 export default Compose(
   withStyles(useStyles),
   graphql(GET_TRAINEE, {
-    options: { variables: { skip: 0, limit: 100, sort: 'name' } },
+    options: { variables: { skip: 0, limit: 50, sort: 'name' } },
   }),
 )(TraineeList);
