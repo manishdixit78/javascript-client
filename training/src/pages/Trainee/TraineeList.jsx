@@ -12,6 +12,7 @@ import { TableComponent } from '../../components';
 import { GET_TRAINEE } from './Query';
 import { MyContext } from '../../contexts/index';
 import { UPDATE_TRAINEE, CREATE_TRAINEE } from './Mutation';
+import { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB } from './Subscription';
 
 const useStyles = (theme) => ({
   root: {
@@ -59,7 +60,6 @@ class TraineeList extends React.Component {
   onSubmitAdd = async (data, openSnackBar, createTrainee, refetch) => {
     try {
       const { name, email, password } = data;
-      console.log('data in cre :', name, email, password);
       await createTrainee({ variables: { name, email, password } });
       refetch();
       this.setState({
@@ -153,6 +153,54 @@ class TraineeList extends React.Component {
       page: newPage,
     }, () => {
       refetch({ variables });
+    });
+  }
+
+  componentDidMount = () => {
+    const { data: { subscribeToMore } } = this.props;
+    subscribeToMore({
+      document: UPDATED_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeUpdated } } = subscriptionData;
+        const updatedRecords = [...record].map((records) => {
+          console.log('ddddd ', records);
+          if (records.originalId === traineeUpdated.originalId) {
+            console.log('found match ');
+            return {
+              ...records,
+              ...traineeUpdated,
+            };
+          }
+          return records;
+        });
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            ...prev.getAllTrainees.TraineeCount,
+            record: updatedRecords,
+          },
+        };
+      },
+    });
+    subscribeToMore({
+      document: DELETED_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeDeleted } } = subscriptionData;
+        console.log(' sub delete : ', traineeDeleted.data.originalId);
+        // eslint-disable-next-line max-len
+        const updatedRecords = [...record].filter((records) => records.originalId !== traineeDeleted.data.originalId);
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            ...prev.getAllTrainees.TraineeCount - 1,
+            record: updatedRecords,
+          },
+        };
+      },
     });
   }
 

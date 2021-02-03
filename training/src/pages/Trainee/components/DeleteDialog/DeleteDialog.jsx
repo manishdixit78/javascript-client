@@ -35,7 +35,7 @@ onClickHandler = async (Data, openSnackBar) => {
   });
   const { onSubmit } = this.props;
   const { deleteTrainee, refetch } = this.props;
-  const { _id: id } = Data;
+  const { originalId: id } = Data;
   const response = await deleteTrainee({ variables: { id } });
   this.setState({ loading: false });
   if (response.data.deleteTrainee !== 'undefined') {
