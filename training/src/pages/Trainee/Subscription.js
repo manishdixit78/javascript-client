@@ -23,4 +23,16 @@ subscription {
   }
 }
 `;
-export { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB };
+
+const CREATE_SUB = gql`
+subscription {
+traineeAdded {
+name
+email
+createdAt
+originalId
+_id
+}
+} 
+`;
+export { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB, CREATE_SUB };

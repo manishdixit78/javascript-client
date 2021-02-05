@@ -12,7 +12,7 @@ import { TableComponent } from '../../components';
 import { GET_TRAINEE } from './Query';
 import { MyContext } from '../../contexts/index';
 import { UPDATE_TRAINEE, CREATE_TRAINEE } from './Mutation';
-import { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB } from './Subscription';
+import { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB, CREATE_SUB } from './Subscription';
 
 const useStyles = (theme) => ({
   root: {
@@ -165,9 +165,7 @@ class TraineeList extends React.Component {
         const { getAllTrainees: { record } } = prev;
         const { data: { traineeUpdated } } = subscriptionData;
         const updatedRecords = [...record].map((records) => {
-          console.log('ddddd ', records);
           if (records.originalId === traineeUpdated.originalId) {
-            console.log('found match ');
             return {
               ...records,
               ...traineeUpdated,
@@ -190,13 +188,31 @@ class TraineeList extends React.Component {
         if (!subscriptionData) return prev;
         const { getAllTrainees: { record } } = prev;
         const { data: { traineeDeleted } } = subscriptionData;
-        console.log(' sub delete : ', traineeDeleted.data.originalId);
         // eslint-disable-next-line max-len
         const updatedRecords = [...record].filter((records) => records.originalId !== traineeDeleted.data.originalId);
         return {
           getAllTrainees: {
             ...prev.getAllTrainees,
             ...prev.getAllTrainees.TraineeCount - 1,
+            record: updatedRecords,
+          },
+        };
+      },
+    });
+    subscribeToMore({
+      document: CREATE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeAdded } } = subscriptionData;
+        record.unshift(traineeAdded);
+        // eslint-disable-next-line max-len
+        const updatedRecords = [...record].unshift((records) => records.originalId !== traineeAdded.originalId);
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            // eslint-disable-next-line radix
+            totalCountOfData: parseInt(prev.getAllTrainees.TraineeCount) + 1,
             record: updatedRecords,
           },
         };
