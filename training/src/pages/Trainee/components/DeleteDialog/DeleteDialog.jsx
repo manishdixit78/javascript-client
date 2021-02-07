@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import React, { Component } from 'react';
 import Dialog from '@material-ui/core/Dialog';
 import Button from '@material-ui/core/Button';
@@ -7,7 +8,6 @@ import DialogContentText from '@material-ui/core/DialogContentText';
 import DialogTitle from '@material-ui/core/DialogTitle';
 import PropTypes from 'prop-types';
 import { MyContext } from '../../../../contexts/index';
-import callApi from '../../../../libs/utils/api';
 
 class DeleteDialog extends Component {
   constructor(props) {
@@ -34,10 +34,12 @@ onClickHandler = async (Data, openSnackBar) => {
     loading: true,
   });
   const { onSubmit } = this.props;
+  const { deleteTrainee, refetch } = this.props;
   const { _id: id } = Data;
-  const response = await callApi(Data, 'delete', `/trainee?id=${id}`);
+  const response = await deleteTrainee({ variables: { id } });
   this.setState({ loading: false });
-  if (response.status === 'OK') {
+  if (response.data.deleteTrainee !== 'undefined') {
+    refetch();
     this.setState({
       message: 'Deleted Successfully ',
     }, () => {

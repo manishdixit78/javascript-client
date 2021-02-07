@@ -98,38 +98,13 @@ class EditDialog extends React.Component {
     return !!iserror.length;
   };
 
-  onClickHandler = async (Data, openSnackBar) => {
-    console.log('data inside edit :', Data)
-    const { onSubmit } = this.props;
-    this.setState({
-      loading: true,
-    });
-    const response = await callApi(Data, 'put', '/trainee');
-    console.log('Response :', response);
-    this.setState({ loading: false });
-    if (response !== 'undefined') {
-      this.setState({
-        message: 'Trainee Updated Successfully',
-      }, () => {
-        const { message } = this.state;
-        openSnackBar(message, 'success');
-      });
-    } else {
-      this.setState({
-        message: 'Error while submitting',
-      }, () => {
-        const { message } = this.state;
-        openSnackBar(message, 'error');
-      });
-    }
-  }
   render() {
     const {
       Editopen, handleEditClose, handleEdit, data, classes,
     } = this.props;
     const { name, email, error, loading } = this.state;
     const { originalId: id } = data;
-    console.log('id in edit: ', id);
+    console.log('id in edit: ', data);
     return (
       <div>
         <Dialog
@@ -197,11 +172,9 @@ class EditDialog extends React.Component {
             <Button onClick={handleEditClose} color="primary">
               Cancel
             </Button>
-            <MyContext.Consumer>
-          {({ openSnackBar }) => (
             <Button
               onClick={() => {
-                this.onClickHandler({ name, email, id }, openSnackBar);
+                handleEdit({ name, email, id });
               }}
               className={
                 (name === data.name && email === data.email) || this.hasErrors()
@@ -219,8 +192,6 @@ class EditDialog extends React.Component {
                   {loading && <span>Submitting</span>}
                   {!loading && <span>Submit</span>}
             </Button>
-                 )}
-                 </MyContext.Consumer>
           </DialogActions>
         </Dialog>
       </div>
