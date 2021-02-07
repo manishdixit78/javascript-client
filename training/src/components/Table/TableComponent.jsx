@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import React from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -31,7 +30,6 @@ function TableComponent(props) {
     classes, data, column, order, orderBy, onSort, onSelect, count, page, actions,
     rowsPerPage, onChangePage, onChangeRowsPerPage,
   } = props;
-  console.log(' data :', data);
 
   return (
     <TableContainer component={Paper}>

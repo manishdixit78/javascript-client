@@ -4,9 +4,11 @@ import PropTypes from 'prop-types';
 import { Button, withStyles } from '@material-ui/core';
 import EditIcon from '@material-ui/icons/Edit';
 import DeleteIcon from '@material-ui/icons/Delete';
+import { graphql } from '@apollo/react-hoc';
+import Compose from 'lodash.flowright';
 import { AddDialog, EditDialog, DeleteDialog } from './components/index';
 import { TableComponent } from '../../components';
-import callApi from '../../libs/utils/api';
+import { GET_TRAINEE } from './Query';
 import { MyContext } from '../../contexts/index';
 
 const useStyles = (theme) => ({
@@ -27,14 +29,10 @@ class TraineeList extends React.Component {
       order: 'asc',
       EditOpen: false,
       RemoveOpen: false,
-      message: '',
       editData: {},
       deleteData: {},
       page: 0,
-      rowsPerPage: 10,
-      loading: false,
-      Count: 0,
-      dataObj: [],
+      rowsPerPage: 5,
     };
   }
 
@@ -74,13 +72,6 @@ class TraineeList extends React.Component {
     this.setState({
       orderBy: field,
       order: order === 'asc' ? 'desc' : 'asc',
-    });
-  };
-
-  handleChangePage = (event, newPage) => {
-    this.componentDidMount(newPage);
-    this.setState({
-      page: newPage,
     });
   };
 
@@ -127,37 +118,28 @@ class TraineeList extends React.Component {
     console.log('Edited Item ', { name, email });
   };
 
-  componentDidMount = () => {
-    this.setState({ loading: true });
-    const value = this.context;
-    console.log('val :', value);
-    // eslint-disable-next-line consistent-return
-    callApi({ }, 'get', `/trainee?skip=${0}&limit=${100}`).then((response) => {
-      if (response.record === undefined) {
-        this.setState({
-          loading: false,
-          message: 'Error, While fetching the Data',
-        }, () => {
-          const { message } = this.state;
-          value.openSnackBar(message, 'error');
-        });
-      } else {
-        console.log('res inside traineelist :', response);
-        const { record } = response;
-        console.log('records aa :', record);
-        this.setState({ dataObj: record, loading: false, Count: 100 });
-        return response;
-      }
+  handlePageChange = (refetch) => (event, newPage) => {
+    const { rowsPerPage } = this.state;
+    this.setState({
+      page: newPage,
+    }, () => {
+      refetch({ skip: newPage * (rowsPerPage.length), limit: rowsPerPage.length });
     });
   }
 
   render() {
     const {
       open, order, orderBy, page,
-      rowsPerPage, EditOpen, RemoveOpen, editData, deleteData, loading, dataObj, Count,
+      rowsPerPage, EditOpen, RemoveOpen, editData, deleteData,
     } = this.state;
-    console.log('data inside traineelist :', dataObj);
     const { classes } = this.props;
+    const {
+      data: {
+        getAllTrainees: { record = [], TraineeCount = 0 } = {},
+        refetch,
+        loading,
+      },
+    } = this.props;
     return (
       <>
         <div className={classes.root}>
@@ -165,7 +147,12 @@ class TraineeList extends React.Component {
             <Button variant="outlined" color="primary" onClick={this.handleClickOpen}>
               ADD TRAINEELIST
             </Button>
-            <AddDialog open={open} onClose={this.handleClose} onSubmit={() => this.handleSubmit} />
+            <AddDialog
+              open={open}
+              onClose={this.handleClose}
+              onSubmit={() => this.handleSubmit}
+              refetch={refetch}
+            />
           </div>
           &nbsp;
           &nbsp;
@@ -187,7 +174,7 @@ class TraineeList extends React.Component {
           <TableComponent
             loader={loading}
             id="id"
-            data={dataObj}
+            data={record}
             column={
               [
                 {
@@ -222,9 +209,9 @@ class TraineeList extends React.Component {
             orderBy={orderBy}
             order={order}
             onSelect={this.handleSelect}
-            count={Count}
+            count={TraineeCount}
             page={page}
-            onChangePage={this.handleChangePage}
+            onChangePage={this.handlePageChange(refetch, TraineeCount)}
             rowsPerPage={rowsPerPage}
             onChangeRowsPerPage={this.handleChangeRowsPerPage}
           />
@@ -236,5 +223,11 @@ class TraineeList extends React.Component {
 TraineeList.contextType = MyContext;
 TraineeList.propTypes = {
   classes: PropTypes.objectOf(PropTypes.string).isRequired,
+  data: PropTypes.objectOf(PropTypes.string).isRequired,
 };
-export default withStyles(useStyles)(TraineeList);
+export default Compose(
+  withStyles(useStyles),
+  graphql(GET_TRAINEE, {
+    options: { variables: { skip: 0, limit: 100, sort: 'name' } },
+  }),
+)(TraineeList);

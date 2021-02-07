@@ -23,6 +23,7 @@
     "axios": "^0.21.1",
     "jsonwebtoken": "^8.5.1",
     "local-storage": "^2.0.0",
+    "lodash.flowright": "^3.5.0",
     "material-ui-password-field": "^2.1.2",
     "moment": "^2.29.1",
     "prop-types": "^15.7.2",

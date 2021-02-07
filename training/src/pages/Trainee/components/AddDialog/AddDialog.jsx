@@ -57,11 +57,14 @@ class AddDialog extends React.Component {
       loading: true,
       hasError: true,
     });
+    // eslint-disable-next-line react/prop-types
+    const { refetch } = this.props;
     const response = await callApi(data, 'post', '/trainee');
     console.log('data :', data);
     this.setState({ loading: false });
     console.log('res :', response);
     if (response.status === 'OK') {
+      refetch();
       this.setState({
         hasError: false,
         message: 'This is a success message',
@@ -133,14 +136,11 @@ class AddDialog extends React.Component {
       const {
         open, onClose, classes,
       } = this.props;
-      // eslint-disable-next-line no-shadow
       const {
-        // eslint-disable-next-line no-shadow
         name, email, password, loading,
       } = this.state;
       const ans = [];
       Object.keys(constant).forEach((key) => {
-        // console.log('key:', key);
         ans.push(<Handler
           label={key}
           onChange={this.handleChange(key)}
