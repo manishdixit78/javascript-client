@@ -6,9 +6,10 @@ import { setContext } from '@apollo/client/link/context';
 import { getMainDefinition } from 'apollo-utilities';
 import { WebSocketLink } from 'apollo-link-ws';
 import { split } from 'apollo-link';
+import config  from '../config/configuration';
 
 
-const httpLink = new HttpLink({ uri: process.env.REACT_APP_APOLLO_GRAPHQL_URI });
+const httpLink = new HttpLink({ uri: config.REACT_APP_APOLLO_GRAPHQL_URI });
 
 const authLink = setContext((_, { headers }) => {
 // get the authentication token if it's exists
@@ -22,7 +23,7 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 const wsLink = new WebSocketLink({
-  uri: process.env.REACT_APP_APOLLO_SUBSCRIPTION_URI,
+  uri: config.REACT_APP_APOLLO_SUBSCRIPTION_URI,
   options: {
     reconnect: true,
   },

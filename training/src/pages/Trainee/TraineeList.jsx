@@ -57,11 +57,10 @@ class TraineeList extends React.Component {
     });
   };
 
-  onSubmitAdd = async (data, openSnackBar, createTrainee, refetch) => {
+  onSubmitAdd = async (data, openSnackBar, createTrainee) => {
     try {
       const { name, email, password } = data;
       await createTrainee({ variables: { name, email, password } });
-      refetch();
       this.setState({
         open: false,
       }, () => {
@@ -126,11 +125,10 @@ class TraineeList extends React.Component {
     });
   };
 
-  onSubmitEdit = async (data, openSnackBar, updateTrainee, refetch) => {
+  onSubmitEdit = async (data, openSnackBar, updateTrainee) => {
     try {
       const { name, email, id } = data;
       await updateTrainee({ variables: { name, email, id } });
-      refetch();
       this.setState({
         EditOpen: false,
       }, () => {
@@ -259,7 +257,7 @@ class TraineeList extends React.Component {
                             onClose={this.handleClose}
                             onSubmit={
                               (data) => this.onSubmitAdd(
-                                data, openSnackBar, createTrainee, refetch,
+                                data, openSnackBar, createTrainee,
                               )
                             }
                             loading={createrLoader}
@@ -272,7 +270,7 @@ class TraineeList extends React.Component {
                           handleEditClose={this.handleEditClose}
                           handleEdit={
                             (data) => this.onSubmitEdit(
-                              data, openSnackBar, updateTrainee, refetch,
+                              data, openSnackBar, updateTrainee,
                             )
                           }
                           data={editData}
