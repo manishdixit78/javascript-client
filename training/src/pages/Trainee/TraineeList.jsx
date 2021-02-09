@@ -12,6 +12,7 @@ import { TableComponent } from '../../components';
 import { GET_TRAINEE } from './Query';
 import { MyContext } from '../../contexts/index';
 import { UPDATE_TRAINEE, CREATE_TRAINEE } from './Mutation';
+import { DELETED_TRAINEE_SUB, UPDATED_TRAINEE_SUB, CREATE_SUB } from './Subscription';
 
 const useStyles = (theme) => ({
   root: {
@@ -56,12 +57,10 @@ class TraineeList extends React.Component {
     });
   };
 
-  onSubmitAdd = async (data, openSnackBar, createTrainee, refetch) => {
+  onSubmitAdd = async (data, openSnackBar, createTrainee) => {
     try {
       const { name, email, password } = data;
-      console.log('data in cre :', name, email, password);
       await createTrainee({ variables: { name, email, password } });
-      refetch();
       this.setState({
         open: false,
       }, () => {
@@ -126,11 +125,10 @@ class TraineeList extends React.Component {
     });
   };
 
-  onSubmitEdit = async (data, openSnackBar, updateTrainee, refetch) => {
+  onSubmitEdit = async (data, openSnackBar, updateTrainee) => {
     try {
       const { name, email, id } = data;
       await updateTrainee({ variables: { name, email, id } });
-      refetch();
       this.setState({
         EditOpen: false,
       }, () => {
@@ -153,6 +151,70 @@ class TraineeList extends React.Component {
       page: newPage,
     }, () => {
       refetch({ variables });
+    });
+  }
+
+  componentDidMount = () => {
+    const { data: { subscribeToMore } } = this.props;
+    subscribeToMore({
+      document: UPDATED_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeUpdated } } = subscriptionData;
+        const updatedRecords = [...record].map((records) => {
+          if (records.originalId === traineeUpdated.originalId) {
+            return {
+              ...records,
+              ...traineeUpdated,
+            };
+          }
+          return records;
+        });
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            ...prev.getAllTrainees.TraineeCount,
+            record: updatedRecords,
+          },
+        };
+      },
+    });
+    subscribeToMore({
+      document: DELETED_TRAINEE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeDeleted } } = subscriptionData;
+        // eslint-disable-next-line max-len
+        const updatedRecords = [...record].filter((records) => records.originalId !== traineeDeleted.data.originalId);
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            ...prev.getAllTrainees.TraineeCount - 1,
+            record: updatedRecords,
+          },
+        };
+      },
+    });
+    subscribeToMore({
+      document: CREATE_SUB,
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData) return prev;
+        const { getAllTrainees: { record } } = prev;
+        const { data: { traineeAdded } } = subscriptionData;
+        record.unshift(traineeAdded);
+        // eslint-disable-next-line max-len
+        const updatedRecords = [...record].unshift((records) => records.originalId !== traineeAdded.originalId);
+        return {
+          getAllTrainees: {
+            ...prev.getAllTrainees,
+            // eslint-disable-next-line radix
+            totalCountOfData: parseInt(prev.getAllTrainees.TraineeCount) + 1,
+            record: updatedRecords,
+          },
+        };
+      },
     });
   }
 
@@ -195,7 +257,7 @@ class TraineeList extends React.Component {
                             onClose={this.handleClose}
                             onSubmit={
                               (data) => this.onSubmitAdd(
-                                data, openSnackBar, createTrainee, refetch,
+                                data, openSnackBar, createTrainee,
                               )
                             }
                             loading={createrLoader}
@@ -208,7 +270,7 @@ class TraineeList extends React.Component {
                           handleEditClose={this.handleEditClose}
                           handleEdit={
                             (data) => this.onSubmitEdit(
-                              data, openSnackBar, updateTrainee, refetch,
+                              data, openSnackBar, updateTrainee,
                             )
                           }
                           data={editData}
